@@ -1,0 +1,38 @@
+body{
+    background-color:rgb(28, 37, 41);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.botonescalculadora{
+    display: flex;
+    width: 240px;
+}
+.calculadora-body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 240px;
+    align-items: stretch;
+}
+.botones{
+    width: 60px;
+    height: 80px;
+}
+.marcooperadores{
+    width: 60px;
+}
+
+.marcobotones{
+width: 180px;
+}
+.zero{
+    width: 180px;
+}
+.igual{
+    height: 120px;
+}
+.marcooperadores .botones{
+    width: 60px;
+    height: 40px;
+}
