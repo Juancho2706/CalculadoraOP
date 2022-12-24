@@ -18,11 +18,7 @@ for (let index = 9; index >= 0; index--) {
         return $elinput.value += index;
     })
     botonescalculadora.addEventListener('click', function(e){
-        todoslosoperadores.forEach(element => {
-            element.disabled = false;
-        });
-        sepresiono1eravez = false;
-        // return verificar($elinput.value);
+        return verificar($elinput.value);
     })
     marcobotones.append(botonescalculadora);
 }
@@ -64,52 +60,21 @@ for (let index = 0; index < 8; index++) {
             case 'C':
                 return $elinput.value = '';
             default:
-                if(sepresiono1eravez){
-                         let stringfuncion = String('return ' + $elinput.value);
-                         let nuevaigual = new Function(stringfuncion);
-                         sepresiono1eravez = false;
-                         todoslosoperadores.forEach(element => {
-                            element.disabled = false;
-                        });
-                         return $elinput.value = nuevaigual().toString();
-                }
-
-                switch(operantes[index].operador){
-                case '+':
-                case '-':
-                case '*':
-                case '/':
+                if(sepresiono1eravez == false){
+                    $elinput.value += operantes[index].operador;
+                    operadoranterior = operantes[index].operador;
                     sepresiono1eravez = true;
-                    todoslosoperadores.forEach(element => {
-                        element.disabled = true;
-                    });
-                    let stringfuncion1 = String('return ' + $elinput.value);
-                    let nuevaigual1 = new Function(stringfuncion1);
-
-                    return $elinput.value = nuevaigual1().toString() + operantes[index].operador;
-                case '=':
-                         let stringfuncion = String('return ' + $elinput.value);
-                         let nuevaigual = new Function(stringfuncion);
-                         todoslosoperadores.forEach(element => {
-                            element.disabled = false;
-                        });
-                         return $elinput.value = nuevaigual();
+                }else{
+                    // operadoranterior = operantes[index].operador;
+                    sepresiono1eravez = false;
+                    return $elinput.value = procesomatematico($elinput.value,operantes[index].operador);
                 }
-                // if(sepresiono1eravez == false){
-                //     $elinput.value += operantes[index].operador;
-                //     operadoranterior = operantes[index].operador;
-                //     sepresiono1eravez = true;
-                // }else{
-                //     // operadoranterior = operantes[index].operador;
-                //     sepresiono1eravez = false;
-                //     return $elinput.value = procesomatematico($elinput.value,operantes[index].operador);
-                // }
                 
         }
     })
-    // botonesoperantes.addEventListener('click', function(e){
-    //     return verificar($elinput.value);
-    // })
+    botonesoperantes.addEventListener('click', function(e){
+        return verificar($elinput.value);
+    })
     marcooperadores.append(botonesoperantes);
 }
 
@@ -155,7 +120,5 @@ function verificar(elstring){
         });
     }
 }
-
-
 
 let todoslosoperadores = document.querySelectorAll('.botonoperador');
