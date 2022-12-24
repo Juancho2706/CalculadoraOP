@@ -1,13 +1,12 @@
-let $elinput = document.querySelector('.untext');
-let $acaba = document.querySelector('.acaba');
-let $calculadorabuttons = document.querySelector('.botonescalculadora');
-const marcobotones = document.createElement('div');
+let $elinput = document.querySelector('.untext');                           //Dom for White bar to display values
+let $calculadorabuttons = document.querySelector('.botonescalculadora');    //Dom for num buttons
+const marcobotones = document.createElement('div');                         //Creating a space to put the buttons
 marcobotones.classList.add('marcobotones');
 $calculadorabuttons.append(marcobotones);
 let sepresiono1eravez = false,
     operadoranterior = '';
 
-for (let index = 9; index >= 0; index--) {
+for (let index = 9; index >= 0; index--) {      //FOR TO MAKE NUMBER BUTTONS
     const botonescalculadora = document.createElement('button');
     botonescalculadora.textContent = index;
     botonescalculadora.classList = 'botones';
@@ -15,18 +14,18 @@ for (let index = 9; index >= 0; index--) {
         botonescalculadora.classList.add('zero');
     }
     botonescalculadora.addEventListener('click', function(e){
+        if($elinput.value == '0'){
+            return $elinput.value = index;
+        }
         return $elinput.value += index;
     })
     botonescalculadora.addEventListener('click', function(e){
-        todoslosoperadores.forEach(element => {
-            element.disabled = false;
-        });
+        verificar(false);
         sepresiono1eravez = false;
-        // return verificar($elinput.value);
     })
     marcobotones.append(botonescalculadora);
 }
-const operantes = {
+const operantes = {                             //THIS IS TO CREATE AN OBJECT OF OPERATORS
         0: {operador: 'Borrar',
         clase: 'backspace'},
         1: {operador: 'C',
@@ -43,13 +42,23 @@ const operantes = {
         clase: 'decimal'},  
         7: {operador: '=',
         clase: 'igual'},
-} //objeto con los operantes (4), clear e igual
-
+}
+function teclaslocas(index){                    //ADDING KEYBOARD SUPPORT TO NUMBERS
+    if(typeof index === 'string' && !isNaN(parseInt(index))){
+        if($elinput.value == '0'){
+                verificar(false);
+                return $elinput.value = index;
+            }
+            verificar(false);
+            return $elinput.value += index;
+    }
+    
+}
 const marcooperadores = document.createElement('div');
 marcooperadores.classList.add('marcooperadores');
 $calculadorabuttons.append(marcooperadores);
 
-for (let index = 0; index < 8; index++) {
+for (let index = 0; index < 8; index++) {       //FOR TO MAKE THE OPERANTS BUTTONS
     const botonesoperantes = document.createElement('button');
     botonesoperantes.textContent = operantes[index].operador;
     botonesoperantes.classList = operantes[index].clase;
@@ -58,104 +67,90 @@ for (let index = 0; index < 8; index++) {
             botonesoperantes.classList.add('botonoperador');
     }
     botonesoperantes.addEventListener('click', function(e){
-        switch(operantes[index].operador){
-            case 'Borrar':
-                return $elinput.value = $elinput.value.slice(0,-1);
-            case 'C':
-                return $elinput.value = '';
-            default:
-                if(sepresiono1eravez){
-                         let stringfuncion = String('return ' + $elinput.value);
-                         let nuevaigual = new Function(stringfuncion);
-                         sepresiono1eravez = false;
-                         todoslosoperadores.forEach(element => {
-                            element.disabled = false;
-                        });
-                         return $elinput.value = nuevaigual().toString();
-                }
-
-                switch(operantes[index].operador){
-                case '+':
-                case '-':
-                case '*':
-                case '/':
-                    sepresiono1eravez = true;
-                    todoslosoperadores.forEach(element => {
-                        element.disabled = true;
-                    });
-                    let stringfuncion1 = String('return ' + $elinput.value);
-                    let nuevaigual1 = new Function(stringfuncion1);
-
-                    return $elinput.value = nuevaigual1().toString() + operantes[index].operador;
-                case '=':
-                         let stringfuncion = String('return ' + $elinput.value);
-                         let nuevaigual = new Function(stringfuncion);
-                         todoslosoperadores.forEach(element => {
-                            element.disabled = false;
-                        });
-                         return $elinput.value = nuevaigual();
-                }
-                // if(sepresiono1eravez == false){
-                //     $elinput.value += operantes[index].operador;
-                //     operadoranterior = operantes[index].operador;
-                //     sepresiono1eravez = true;
-                // }else{
-                //     // operadoranterior = operantes[index].operador;
-                //     sepresiono1eravez = false;
-                //     return $elinput.value = procesomatematico($elinput.value,operantes[index].operador);
-                // }
-                
-        }
-    })
-    // botonesoperantes.addEventListener('click', function(e){
-    //     return verificar($elinput.value);
-    // })
+        elevento(index)})
     marcooperadores.append(botonesoperantes);
 }
+const todoslosoperadores = document.querySelectorAll('.botonoperador');     //DOM FOR SELECTING ALL THE OPERANTS BUTTONS
 
-function procesomatematico(elvalor, operador){
-    let splitarray = elvalor.split(operadoranterior);
-
-    if(operador == '='){
-
-        let stringfuncion = String('return ' + splitarray[0]+operadoranterior+splitarray[1])
-        let nuevaigual = new Function(stringfuncion);
+function verificar(prendeapaga){                //CHECK IF THERE IS ALREADY A '.' AND IF IT ALTERNATES BETWEEN DISABLING THE OPERANTS OR NOT
+        todoslosoperadores.forEach(element => {
+            element.disabled = prendeapaga;
+        });
+        if($elinput.value.indexOf('.') !== -1){
+            todoslosoperadores[4].disabled = true;
+        }
+}
+function nuevaigual(valorinput){                //MAKES A NEW FUNCTION WITH THE INPUT VALUE AND RETURNS THE EQUATION
+    let stringfuncion = String('return ' + valorinput);
+    let nuevaigual = new Function(stringfuncion);
+    if(Number.isInteger(nuevaigual())){
         return nuevaigual();
+    }else{
+        return nuevaigual().toFixed(2);
     }
-
-    if(!(isNaN(Number(elvalor.charAt(elvalor.length - 1))))){
-        switch(operadoranterior){
-                case '+':
-                    operadoranterior = operador;
-                    return Number(splitarray[0]) + Number(splitarray[1]).toFixed(2) + operador;
-                case '-':
-                    operadoranterior = operador;
-                    return Number(splitarray[0]) - Number(splitarray[1]).toFixed(2) + operador;
-                case '*':
-                    operadoranterior = operador;
-                    return Number(splitarray[0]) * Number(splitarray[1]).toFixed(2) + operador;
-                case '/':
-                    operadoranterior = operador;
-                    return Number(splitarray[0]) / Number(splitarray[1]).toFixed(2) + operador;
-                default:
-                    break;            
+}
+function elevento(index){                       //MAIN FUNCTION, this takes the operators and resolve the math problem and evaluates it
+    switch(operantes[index].operador){
+        case 'Borrar':
+            $elinput.value = $elinput.value.slice(0,-1);
+            if(!(/\d$/.test($elinput.value))){
+                verificar(true);
+            }else{
+                verificar(false);
             }
-    }else{
-        return elvalor + operador;
+            break;
+        case 'C':
+            verificar(false);
+            todoslosoperadores[4].disabled = false;
+            return $elinput.value = '0';
+        default:
+            if(sepresiono1eravez){
+                     sepresiono1eravez = false;
+                     verificar(false);
+                     return $elinput.value = nuevaigual($elinput.value).toString();
+            }
+            switch(operantes[index].operador){
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+                sepresiono1eravez = true;
+                verificar(true);
+                $elinput.textContent = nuevaigual($elinput.value) + operantes[index].operador;
+                return $elinput.value = nuevaigual($elinput.value) + operantes[index].operador;
+            case '=':
+                verificar(false);
+                if($elinput.value.indexOf('.') !== -1){
+                    todoslosoperadores[4].disabled = true;
+                }
+                return $elinput.value = nuevaigual($elinput.value);
+            case '.':
+                verificar(true);
+                return $elinput.value = $elinput.value + operantes[index].operador;
+            }   
     }
 }
-function verificar(elstring){
-    if(isNaN(Number(elstring.charAt(elstring.length - 1)))){
-        todoslosoperadores.forEach(element => {
-            element.disabled = true;
-        });
-    }else{
-        todoslosoperadores.forEach(element => {
-            element.disabled = false;
-        });
-    }
-}
-
-
-
-let todoslosoperadores = document.querySelectorAll('.botonoperador');
+document.addEventListener('keydown', function(e){ //TO ADD KEY SUPPORT FOR THE OPERANTS
+    let key = e.key;
+    console.log(key);
+    teclaslocas(key);
+    switch(key){
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '=':
+            case '.':
+                for (let index = 0; index < 8; index++) {
+                    if(operantes[index].operador == key){
+                        return elevento(index);
+                    }
+                }
+            case 'Delete':
+                return elevento(1);
+            case 'Backspace':
+                return elevento(0);
+            case 'Enter':
+                return elevento(6);
+            }   
+})
