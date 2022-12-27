@@ -33,6 +33,7 @@ body{
     border-radius: 100px;
     color: white;
     border-style: hidden;
+    transition: all 0.3s ease-in-out;
 }
 .marcooperadores{
     width: 44px;
@@ -77,3 +78,12 @@ body{
     background-color: #BBBBBB;
     color: #212121;
 }
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  button:active {
+    transform: scale(0.9);
+
+  }
