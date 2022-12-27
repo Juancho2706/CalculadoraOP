@@ -5,6 +5,7 @@ marcobotones.classList.add('marcobotones');
 $calculadorabuttons.append(marcobotones);
 let sepresiono1eravez = false,
     operadoranterior = '';
+$elinput.value = '0';
 
 for (let index = 9; index >= 0; index--) {      //FOR TO MAKE NUMBER BUTTONS
     const botonescalculadora = document.createElement('button');
@@ -63,6 +64,9 @@ for (let index = 0; index < 8; index++) {       //FOR TO MAKE THE OPERANTS BUTTO
     botonesoperantes.textContent = operantes[index].operador;
     botonesoperantes.classList = operantes[index].clase;
     botonesoperantes.classList.add('botones');
+    if(index < 2){
+        botonesoperantes.classList.add('botonborrar');
+}
     if(index >= 2){
             botonesoperantes.classList.add('botonoperador');
     }
@@ -83,6 +87,7 @@ function verificar(prendeapaga){                //CHECK IF THERE IS ALREADY A '.
 function nuevaigual(valorinput){                //MAKES A NEW FUNCTION WITH THE INPUT VALUE AND RETURNS THE EQUATION
     let stringfuncion = String('return ' + valorinput);
     let nuevaigual = new Function(stringfuncion);
+    
     if(Number.isInteger(nuevaigual())){
         return nuevaigual();
     }else{
@@ -98,13 +103,17 @@ function elevento(index){                       //MAIN FUNCTION, this takes the 
             }else{
                 verificar(false);
             }
+            if($elinput.value == ''){
+                $elinput.value = '0';
+                verificar(false);
+            }
             break;
         case 'C':
             verificar(false);
             todoslosoperadores[4].disabled = false;
             return $elinput.value = '0';
         default:
-            if(sepresiono1eravez){
+            if(sepresiono1eravez == true){
                      sepresiono1eravez = false;
                      verificar(false);
                      return $elinput.value = nuevaigual($elinput.value).toString();
@@ -114,15 +123,17 @@ function elevento(index){                       //MAIN FUNCTION, this takes the 
             case '-':
             case '*':
             case '/':
-                sepresiono1eravez = true;
+                entrecero($elinput.value);
+                // sepresiono1eravez = true;
                 verificar(true);
-                $elinput.textContent = nuevaigual($elinput.value) + operantes[index].operador;
+                // $elinput.textContent = nuevaigual($elinput.value) + operantes[index].operador;
                 return $elinput.value = nuevaigual($elinput.value) + operantes[index].operador;
             case '=':
                 verificar(false);
                 if($elinput.value.indexOf('.') !== -1){
                     todoslosoperadores[4].disabled = true;
                 }
+                entrecero($elinput.value);
                 return $elinput.value = nuevaigual($elinput.value);
             case '.':
                 verificar(true);
@@ -131,26 +142,42 @@ function elevento(index){                       //MAIN FUNCTION, this takes the 
     }
 }
 document.addEventListener('keydown', function(e){ //TO ADD KEY SUPPORT FOR THE OPERANTS
-    let key = e.key;
-    console.log(key);
-    teclaslocas(key);
-    switch(key){
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-            case '=':
-            case '.':
-                for (let index = 0; index < 8; index++) {
-                    if(operantes[index].operador == key){
-                        return elevento(index);
+    if((todoslosoperadores[4].disabled) == true){
+        let key = e.key;
+        console.log(key);
+        return teclaslocas(key);
+    }
+    if($elinput.value.indexOf(operantes.operador) !== -1){
+        todoslosoperadores[4].disabled = true;
+    }
+        let key = e.key;
+        console.log(key);
+        teclaslocas(key);
+        switch(key){
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '=':
+                case '.':
+                    for (let index = 0; index < 8; index++) {
+                        if(operantes[index].operador == key){
+                            return elevento(index);
+                        }
                     }
-                }
-            case 'Delete':
-                return elevento(1);
-            case 'Backspace':
-                return elevento(0);
-            case 'Enter':
-                return elevento(6);
-            }   
+                case 'Delete':
+                    return elevento(1);
+                case 'Backspace':
+                    return elevento(0);
+                case 'Enter':
+                    return elevento(6);
+            }
+           
 })
+function entrecero (valor){                     //CANT DIVIDE TO 0
+    if(valor.includes('/0')){
+        alert('Told ya');
+        $elinput.value = "0";
+        return window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+    }
+}
